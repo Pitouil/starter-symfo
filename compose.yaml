@@ -11,7 +11,7 @@ services:
       - db
 
   node:
-    image: node:22-alpine
+    image: node:22
     container_name: ai_test_node
     ports:
       - "3000:3000"
