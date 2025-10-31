@@ -1,8 +1,21 @@
 test-api.local
-# Proxy assets /dev mode vers Vite (node:3000)
+
+root * /var/www/html/public
+
+file_server
+
+@php {
+    path_regexp \.php$
+}
+reverse_proxy @php php:9000
+
+@notFile {
+    file {
+        try_files {path} {path}/ /index.php
+    }
+}
+rewrite @notFile /index.php
+
 handle /assets/* {
     reverse_proxy node:3000
 }
-
-# Proxy PHP vers Symfony
-reverse_proxy / php:8000
