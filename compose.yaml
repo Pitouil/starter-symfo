@@ -1,0 +1,70 @@
+services:
+  php:
+    build:
+      dockerfile: ./Dockerfile
+      target: php
+    container_name: ai_test_php
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+
+  node:
+    image: node:22-alpine
+    container_name: ai_test_node
+    ports:
+      - "3000:3000"
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: tail -f /dev/null
+    tty: true
+
+
+
+  caddy:
+    image: caddy:latest
+    container_name: ai_test_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./../:/var/www/html
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./volumes/caddy/data:/data
+      - ./volumes/caddy/config:/config
+      - ./volumes/caddy/certs:/certs
+    depends_on:
+      - php
+
+  db:
+    image: mariadb:latest
+    container_name: ai_test_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ai_test
+    volumes:
+      - ./volumes/db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ai_test_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      UPLOAD_LIMIT: 256M
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+volumes:
+  ai_test_db_data:
+  caddy_data:
+  caddy_config:

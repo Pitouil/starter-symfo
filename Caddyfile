@@ -1,0 +1,8 @@
+test-api.local
+# Proxy assets /dev mode vers Vite (node:3000)
+handle /assets/* {
+    reverse_proxy node:3000
+}
+
+# Proxy PHP vers Symfony
+reverse_proxy / php:8000
